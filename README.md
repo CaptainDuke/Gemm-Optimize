@@ -1,5 +1,5 @@
-# This is a folloup project for Gemm optimization
-
+# This is a followup project for Gemm optimization
+I will record how to optimize computation in Matrix multiplication step by step.
 
 # How To Optimize Gemm wiki pages
 https://github.com/flame/how-to-optimize-gemm/wiki
