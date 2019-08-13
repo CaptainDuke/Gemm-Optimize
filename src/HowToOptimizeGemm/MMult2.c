@@ -14,12 +14,20 @@ void MY_MMult( int m, int n, int k, double *a, int lda,
 {
   int i, j;
 
-  for ( j=0; j<n; j+=1 ){        /* Loop over the columns of C */
+  for ( j=0; j<n; j+=4 ){        /* Loop over the columns of C , count 4 per time*/
     for ( i=0; i<m; i+=1 ){        /* Loop over the rows of C */
       /* Update the C( i,j ) with the inner product of the ith row of A
 	 and the jth column of B */
 
       AddDot( k, &A( i,0 ), lda, &B( 0,j ), &C( i,j ) );
+
+      AddDot( k, &A( i,0 ), lda, &B( 0,j + 1), &C( i,j+1 ) );
+      
+      AddDot( k, &A( i,0 ), lda, &B( 0,j + 2), &C( i,j+2 ) );
+      
+      AddDot( k, &A( i,0 ), lda, &B( 0,j + 3), &C( i,j+3 ) );
+
+
     }
   }
 }

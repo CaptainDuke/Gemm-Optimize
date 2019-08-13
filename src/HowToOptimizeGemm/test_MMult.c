@@ -51,24 +51,24 @@ int main()
     cref = ( double * ) malloc( ldc * n * sizeof( double ) );
 
     /* Generate random matrices A, B, Cold */
-    random_matrix( m, k, a, lda );
-    random_matrix( k, n, b, ldb );
-    random_matrix( m, n, cold, ldc );
+    random_matrix( m, k, a, lda );                    // a = random
+    random_matrix( k, n, b, ldb );                    // b = random
+    random_matrix( m, n, cold, ldc );                 // cold = random
 
-    copy_matrix( m, n, cold, ldc, cref, ldc );
+    copy_matrix( m, n, cold, ldc, cref, ldc );        // cerf = cold
 
     /* Run the reference implementation so the answers can be compared */
 
-    REF_MMult( m, n, k, a, lda, b, ldb, cref, ldc );
+    REF_MMult( m, n, k, a, lda, b, ldb, cref, ldc );   // cerf = cerf + a*b
 
     /* Time the "optimized" implementation */
     for ( rep=0; rep<NREPEATS; rep++ ){
-      copy_matrix( m, n, cold, ldc, c, ldc );
+      copy_matrix( m, n, cold, ldc, c, ldc );          // c = cold
 
       /* Time your implementation */
       dtime = dclock();
 
-      MY_MMult( m, n, k, a, lda, b, ldb, c, ldc );
+      MY_MMult( m, n, k, a, lda, b, ldb, c, ldc );     // c = c + a*b
       
       dtime = dclock() - dtime;
 
@@ -78,7 +78,7 @@ int main()
 	dtime_best = ( dtime < dtime_best ? dtime : dtime_best );
     }
 
-    diff = compare_matrices( m, n, c, ldc, cref, ldc );
+    diff = compare_matrices( m, n, c, ldc, cref, ldc );  // compare c and cerf 
 
     printf( "%d %le %le \n", p, gflops / dtime_best, diff );
     fflush( stdout );

@@ -7,22 +7,33 @@
 /* Routine for computing C = A * B + C */
 
 void AddDot( int, double *, int, double *, double * );
-
+void AddDot1x4(int, double *, int, double *, int, double *, int);
 void MY_MMult( int m, int n, int k, double *a, int lda, 
                                     double *b, int ldb,
                                     double *c, int ldc )
 {
   int i, j;
 
-  for ( j=0; j<n; j+=1 ){        /* Loop over the columns of C */
+  for ( j=0; j<n; j+=4 ){        /* Loop over the columns of C , count 4 per time*/
     for ( i=0; i<m; i+=1 ){        /* Loop over the rows of C */
       /* Update the C( i,j ) with the inner product of the ith row of A
 	 and the jth column of B */
+      AddDot1x4(k, &A(i,0), lda, &B(0, j), ldb, &C(i,j), ldc);
 
-      AddDot( k, &A( i,0 ), lda, &B( 0,j ), &C( i,j ) );
+
     }
   }
 }
+
+void AddDot1x4(int k, double* a, int lda, double *b, int ldb, double * c, int ldc)
+{
+  AddDot(k, &A(0,0), lda, &B(0,0),&C(0,0));
+  AddDot(k, &A(0,0), lda, &B(0,1),&C(0,1));
+  AddDot(k, &A(0,0), lda, &B(0,2),&C(0,2));
+  AddDot(k, &A(0,0), lda, &B(0,3),&C(0,3));
+
+}
+
 
 
 /* Create macro to let X( i ) equal the ith element of x */
