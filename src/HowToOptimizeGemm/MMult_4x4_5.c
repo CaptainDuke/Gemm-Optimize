@@ -51,87 +51,24 @@ void AddDot4x4(int k, double *a, int lda, double *b, int ldb, double *c, int ldc
   for(p = 0; p < k; p++)
   {
     C(0,0) += A(0, p) * B(p, 0);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(0,1) += A(0, p) * B(p, 1);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(0,2) += A(0, p) * B(p, 2);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(0,3) += A(0, p) * B(p, 3);
-  }
 
-
-// Second row
-
-  for(p = 0; p < k; p++)
-  {
     C(1,0) += A(1, p) * B(p, 0);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(1,1) += A(1, p) * B(p, 1);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(1,2) += A(1, p) * B(p, 2);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(1,3) += A(1, p) * B(p, 3);
-  }
-
-
   // Third row
-  for(p = 0; p < k; p++)
-  {
     C(2,0) += A(2, p) * B(p, 0);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(2,1) += A(2, p) * B(p, 1);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(2,2) += A(2, p) * B(p, 2);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(2,3) += A(2, p) * B(p, 3);
-  }
-
 
   // Fourth row
-  for(p = 0; p < k; p++)
-  {
     C(3,0) += A(3, p) * B(p, 0);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(3,1) += A(3, p) * B(p, 1);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(3,2) += A(3, p) * B(p, 2);
-  }
-
-  for(p = 0; p < k; p++)
-  {
     C(3,3) += A(3, p) * B(p, 3);
   }
 
