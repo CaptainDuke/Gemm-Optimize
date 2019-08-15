@@ -91,7 +91,7 @@ void AddDot4x4( int k, double *a, int lda,  double *b, int ldb, double *c, int l
     c_12_reg += a_1p_reg * B( p, 2 );     
     c_13_reg += a_1p_reg * B( p, 3 );     
 
-    /* Third row */
+`    /* Third row */
     c_20_reg += a_2p_reg * B( p, 0 );     
     c_21_reg += a_2p_reg * B( p, 1 );     
     c_22_reg += a_2p_reg * B( p, 2 );     
