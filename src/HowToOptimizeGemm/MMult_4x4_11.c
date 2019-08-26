@@ -6,20 +6,45 @@
 
 /* Routine for computing C = A * B + C */
 
+#define mc 256
+#define kc 128
+
+#define min(i, j) ((i) < (j) ? (i): (j))
+
+
+
 void AddDot4x4(int k, double *a, int lda, double *b, int ldb, double *c, int ldc);
 void MY_MMult( int m, int n, int k, double *a, int lda, 
                                     double *b, int ldb,
                                     double *c, int ldc )
 {
-  int i, j;
+  int i, j, p, pb, ib;
 
-  for ( j=0; j<n; j+=4 ){        /* Loop over the columns of C , count 4 per time*/
-    for ( i=0; i<m; i+=4 ){        /* Loop over the rows of C */
-      /* Update the C( i,j ) with the inner product of the ith row of A
-	 and the jth column of B */
+/*
+  for ( j=0; j<n; j+=4 ){        // Loop over the columns of C , count 4 per time
+    for ( i=0; i<m; i+=4 ){        // Loop over the rows of C 
 
       AddDot4x4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i,j), ldc);
+    }
+  }
+*/
+  for (p = 0; p < k; p += kc){
+    pb = min(k - p, kc);
+    for(i = 0; i < m; i += mc){
+      ib = min(m - i, mc);
+      InnerKernel(ib, n, pb, &A(i, p), lda, &B(p, 0), ldb, &C(i, 0), ldc);
+    }
+  }
+}
 
+void InnerKernel(int m, int n, int k, double *a, int lda,
+                                      double *b, int ldb,
+                                      double *c, int ldc)
+{
+  int i, j;
+  for (int j = 0; j < n; j += 4){
+    for(int i = 0; i < m; i += 4){
+      AddDot4x4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc);
     }
   }
 }
