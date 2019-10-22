@@ -1,5 +1,6 @@
 # This is a followup project for Gemm optimization
 I will record how to optimize computation in Matrix multiplication step by step.
+Add Unicode dictionary, with row first implementation.
 
 # How To Optimize Gemm wiki pages
 https://github.com/flame/how-to-optimize-gemm/wiki
