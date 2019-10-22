@@ -1,11 +1,8 @@
+/* Create macros so that the matrices are stored in row-major order */
 
-#include "MyMM.h"
-
-/* Create macros so that the matrices are stored in column-major order */
-
-#define A(i,j) a[ (j)*lda + (i) ]
-#define B(i,j) b[ (j)*ldb + (i) ]
-#define C(i,j) c[ (j)*ldc + (i) ]
+#define A(i,j) a[ (i)*lda + (j) ]
+#define B(i,j) b[ (i)*ldb + (j) ]
+#define C(i,j) c[ (i)*ldc + (j) ]
 
 /* Routine for computing C = A * B + C */
 
@@ -16,13 +13,12 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
                                     float *c, int ldc )
 {
   int i, j;
-
-  for ( j=0; j<n; j+=1 ){        /* Loop over the columns of C */
-    for ( i=0; i<m; i+=1 ){        /* Loop over the rows of C */
+  for ( i=0; i<m; i+=1 ){        /* Loop over the rows of C */
+    for ( j=0; j<n; j+=1 ){        /* Loop over the columns of C */
       /* Update the C( i,j ) with the inner product of the ith row of A
 	 and the jth column of B */
 
-      AddDot( k, &A( i,0 ), lda, &B( 0,j ), &C( i,j ) );
+      AddDot( k, &A( i,0 ), ldb, &B( 0,j ), &C( i,j ) );
     }
   }
 }
@@ -30,9 +26,10 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
 
 /* Create macro to let X( i ) equal the ith element of x */
 
-#define X(i) x[ (i)*incx ]
+// #define X(i) x[ (i)*incx ]
+#define Y(i) y[ (i)*incy ]
 
-void AddDot( int k, float *x, int incx,  float *y, float *gamma )
+void AddDot( int k, float *x, int incy,  float *y, float *gamma )
 {
   /* compute gamma := x' * y + gamma with vectors x and y of length n.
 
@@ -42,6 +39,7 @@ void AddDot( int k, float *x, int incx,  float *y, float *gamma )
   int p;
 
   for ( p=0; p<k; p++ ){
-    *gamma += X( p ) * y[ p ];     // notice: column first
+    // *gamma += X( p ) * y[ p ];     
+    *gamma += x[p] * Y(p);     
   }
 }

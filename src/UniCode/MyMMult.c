@@ -7,9 +7,9 @@
 
 static double gtod_ref_time_sec = 0.0;
 
-#define A( i,j ) a[ (j)*lda + (i) ]  // row first
-#define B(i,j) b[ (j)*ldb + (i) ]
-#define C(i,j) c[ (j)*ldc + (i) ]
+#define A(i,j) a[ (i)*lda + (j) ]  // row first
+#define B(i,j) b[ (i)*ldb + (j) ]
+#define C(i,j) c[ (i)*ldc + (j) ]
 
 double dclock()
 {
@@ -30,12 +30,11 @@ double dclock()
 
 void random_matrix( int m, int n, float *a, int lda )
 {
-  float frand48();
+  // float frand48();
   int i,j;
-
-  for ( j=0; j<n; j++ )
-    for ( i=0; i<m; i++ )
-      A( i,j ) = 2.0 * drand48( ) - 1.0;
+  for ( i=0; i<m; i++ )
+    for ( j=0; j<n; j++ )
+      A( i,j ) = 2.0 * (float)drand48( ) - 1.0;
 }
 
 
@@ -59,9 +58,8 @@ void REF_MMult( int m, int n, int k, float *a, int lda,
 void copy_matrix( int m, int n, float *a, int lda, float *b, int ldb )
 {
   int i, j;
-
-  for ( j=0; j<n; j++ )
-    for ( i=0; i<m; i++ )
+  for ( i=0; i<m; i++ )
+    for ( j=0; j<n; j++ )
       B( i,j ) = A( i,j );
 }
   
