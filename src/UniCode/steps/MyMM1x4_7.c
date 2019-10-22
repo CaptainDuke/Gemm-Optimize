@@ -55,40 +55,14 @@ void AddDot1x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
   c_20_reg = 0.0;
   c_30_reg = 0.0;
   
-  for(p = 0; p < k; p+=4){
+  for(p = 0; p < k; p++){
     
     b_p0_reg = B(p, 0);
 
-    c_00_reg += *a0p_ptr * b_p0_reg;
-    c_10_reg += *a1p_ptr * b_p0_reg;
-    c_20_reg += *a2p_ptr * b_p0_reg;
-    c_30_reg += *a3p_ptr * b_p0_reg;
-
-    b_p0_reg = B(p+1, 0);
-
-    c_00_reg += *(a0p_ptr+1) * b_p0_reg;
-    c_10_reg += *(a1p_ptr+1) * b_p0_reg;
-    c_20_reg += *(a2p_ptr+1) * b_p0_reg;
-    c_30_reg += *(a3p_ptr+1) * b_p0_reg;
-
-    b_p0_reg = B(p+2, 0);
-
-    c_00_reg += *(a0p_ptr+2) * b_p0_reg;
-    c_10_reg += *(a1p_ptr+2) * b_p0_reg;
-    c_20_reg += *(a2p_ptr+2) * b_p0_reg;
-    c_30_reg += *(a3p_ptr+2) * b_p0_reg;
-
-    b_p0_reg = B(p+3, 0);
-
-    c_00_reg += *(a0p_ptr+3) * b_p0_reg;
-    c_10_reg += *(a1p_ptr+3) * b_p0_reg;
-    c_20_reg += *(a2p_ptr+3) * b_p0_reg;
-    c_30_reg += *(a3p_ptr+3) * b_p0_reg;
-
-    a0p_ptr+=4;
-    a1p_ptr+=4;
-    a2p_ptr+=4;
-    a3p_ptr+=4;
+    c_00_reg += *a0p_ptr++ * b_p0_reg;
+    c_10_reg += *a1p_ptr++ * b_p0_reg;
+    c_20_reg += *a2p_ptr++ * b_p0_reg;
+    c_30_reg += *a3p_ptr++ * b_p0_reg;
   }
 
   C(0, 0) += c_00_reg;
