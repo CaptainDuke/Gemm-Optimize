@@ -1,7 +1,7 @@
 # for Unicode
 
-
-NEW := MyMM1
+OLD := MyMM1
+NEW := MyMM2
 
 CFLAGS := -O2 -msse3 -mavx -mavx2
 LDFLAGS := -lm
@@ -16,12 +16,14 @@ run: MyMM.o MyMMult.o
 	gcc  $(CFLAGS) $(LDFLAGS) MyMM.o MyMMult.o -o run
 	@rm MyMMult.o 
 	@rm MyMM.o
-	#@rm ./figs/output_$(NEW).m
+
+
 	@echo "" > ./figs/output_$(NEW).m 
 	export OMP_NUM_THREADS=1
 	export GOTO_NUM_THREADS=1
 	@./run >> ./figs/output_$(NEW).m 
-	#@python plot.py 
+	@python plot.py $(OLD) $(NEW)
+
 
 clean:
 	rm -f *.o

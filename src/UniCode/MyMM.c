@@ -13,11 +13,14 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
                                     float *c, int ldc )
 {
   int i, j;
-  for ( i=0; i<m; i+=1 ){        /* Loop over the rows of C */
+  for ( i=0; i<m; i+=4 ){        /* Loop over the rows of C */
     for ( j=0; j<n; j+=1 ){        /* Loop over the columns of C */
       /* Update the C( i,j ) with the inner product of the ith row of A
 	 and the jth column of B */
       AddDot( k, &A( i,0 ), n, &B( 0,j ), &C( i,j ) );
+      AddDot( k, &A( i+1,0 ), n, &B( 0,j ), &C( i+1,j ) );
+      AddDot( k, &A( i+2,0 ), n, &B( 0,j ), &C( i+2,j ) );
+      AddDot( k, &A( i+3,0 ), n, &B( 0,j ), &C( i+3,j ) );
     }
   }
 }

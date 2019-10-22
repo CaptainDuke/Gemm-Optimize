@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 
 def readFile(filename):
@@ -26,11 +27,20 @@ def readFile(filename):
     return title, sizes, times
 
 if __name__ == '__main__':
+
+    # old = 'MyMM1'
+    # new = 'MyMM2'
+
+    old = sys.argv[1]
+    new = sys.argv[2]
+
+
+
     plt.xlabel('size')
     plt.ylabel('gflops')
-    t1, x1, y1 = readFile('./figs/output_MyMM1.m')
-    plt.plot(x1, y1, label=t1)
-    # t2, x2, y2 = readFile('output_new.m')
-    # plt.plot(x2, y2, label=t2)
-    plt.legend()
+    t1, x1, y1 = readFile('./figs/output_'+old+'.m')
+    plt.plot(x1, y1, label=t1, marker='*')
+    t2, x2, y2 = readFile('./figs/output_'+new+'.m')
+    plt.plot(x2, y2, label=t2, marker='^')
+    plt.legend((old, new), loc='upper right')
     plt.show()
