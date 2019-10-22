@@ -26,10 +26,6 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
 
 void AddDot1x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
 {
-  // AddDot( k, &A( 0,0 ), ldb, &B( 0,0 ), &C( 0,0 ) );
-  // AddDot( k, &A( 1,0 ), ldb, &B( 0,0 ), &C( 1,0 ) );
-  // AddDot( k, &A( 2,0 ), ldb, &B( 0,0 ), &C( 2,0 ) );
-  // AddDot( k, &A( 3,0 ), ldb, &B( 0,0 ), &C( 3,0 ) );
 
   int p;
   for(p = 0; p < k; p++){
@@ -41,22 +37,4 @@ void AddDot1x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
   }
 }
 
-/* Create macro to let X( i ) equal the ith element of x */
 
-// #define X(i) x[ (i)*incx ]
-#define Y(i) y[ (i)*incy ]
-
-void AddDot( int k, float *x, int incy,  float *y, float *gamma )
-{
-  /* compute gamma := x' * y + gamma with vectors x and y of length n.
-
-     Here x starts at location x with increment (stride) incx and y starts at location y and has (implicit) stride of 1.
-  */
- 
-  int p;
-
-  for ( p=0; p<k; p++ ){
-    // *gamma += X( p ) * y[ p ];     
-    *gamma += x[p] * Y(p);     
-  }
-}

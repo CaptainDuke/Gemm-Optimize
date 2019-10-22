@@ -26,19 +26,19 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
 
 void AddDot1x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
 {
-  // AddDot( k, &A( 0,0 ), ldb, &B( 0,0 ), &C( 0,0 ) );
-  // AddDot( k, &A( 1,0 ), ldb, &B( 0,0 ), &C( 1,0 ) );
-  // AddDot( k, &A( 2,0 ), ldb, &B( 0,0 ), &C( 2,0 ) );
-  // AddDot( k, &A( 3,0 ), ldb, &B( 0,0 ), &C( 3,0 ) );
+  AddDot( k, &A( 0,0 ), ldb, &B( 0,0 ), &C( 0,0 ) );
+  AddDot( k, &A( 1,0 ), ldb, &B( 0,0 ), &C( 1,0 ) );
+  AddDot( k, &A( 2,0 ), ldb, &B( 0,0 ), &C( 2,0 ) );
+  AddDot( k, &A( 3,0 ), ldb, &B( 0,0 ), &C( 3,0 ) );
 
-  int p;
-  for(p = 0; p < k; p++){
-    C(0, 0) += A(0, p) * B(p, 0);
-    C(1, 0) += A(1, p) * B(p, 0);
-    C(2, 0) += A(2, p) * B(p, 0);
-    C(3, 0) += A(3, p) * B(p, 0);
+  // int p;
+  // for(p = 0; p < k; p++){
+  //   C(0, 0) += A(0, p) * B(p, 0);
+  //   C(1, 0) += A(1, p) * B(p, 0);
+  //   C(2, 0) += A(2, p) * B(p, 0);
+  //   C(3, 0) += A(3, p) * B(p, 0);
 
-  }
+  // }
 }
 
 /* Create macro to let X( i ) equal the ith element of x */
