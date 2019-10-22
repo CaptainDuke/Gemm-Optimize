@@ -1,7 +1,7 @@
 # for Unicode
 
-OLD := MyMM1x4_5
-NEW := MyMM1x4_9
+OLD := MyMM2
+NEW := MyMM4x4_3
 
 CFLAGS := -O2 -msse3 -mavx -mavx2
 LDFLAGS := -lm

@@ -105,9 +105,9 @@ int main(){
 
     gflops = 2.0 * m * n * k * 1.0e-09;
 
-    lda = m;
+    lda = k;
     ldb = n;
-    ldc = m;
+    ldc = n;
 
     a = (float *) malloc(lda * (k+1) * sizeof(float));
     b = (float *) malloc(ldb * n * sizeof(float));
