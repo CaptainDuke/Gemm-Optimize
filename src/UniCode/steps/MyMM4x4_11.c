@@ -6,8 +6,8 @@
 
 /* Routine for computing C = A * B + C */
 
-#define mc 256
-#define kc 128
+#define nc 128
+#define kc 256
 #define min(i, j) ( (i) < (j) ? (i) : (j))
 
 
@@ -21,15 +21,15 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
 {
   int i, j;
 
-  int p, pb, ib;
+  int p, pb, jb;
 
   for ( p=0; p<k; p+=kc ){        
     pb = min(k - p, kc);      // pb = p_block = 256
-    for ( i=0; i<m; i+=mc ){
-      ib = min(m - i, mc);        // ib = i_block = 128
+    for ( j=0; j<n; j+=nc ){
+      jb = min(n - j, nc);        // jb = j_block = 128
 
-
-      InnerKernel(ib, n, pb, &A(i, p), lda, &B(p, 0), ldb, &C(i, 0), ldc);
+      // 
+      InnerKernel(m, jb, pb, &A(0, p), lda, &B(p, j), ldb, &C(0, j), ldc);
    
     }
   }
