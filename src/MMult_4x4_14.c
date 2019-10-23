@@ -48,7 +48,7 @@ void InnerKernel( int m, int n, int k, double *a, int lda,
       /* Update C( i,j ), C( i,j+1 ), C( i,j+2 ), and C( i,j+3 ) in
 	 one routine (four inner products) */
       if ( j == 0 ) 
-	PackMatrixA( k, &A( i, 0 ), lda, &packedA[ i*k ] );
+	      PackMatrixA( k, &A( i, 0 ), lda, &packedA[ i*k ] );
       AddDot4x4( k, &packedA[ i*k ], 4, &packedB[ j*k ], k, &C( i,j ), ldc );
     }
   }

@@ -11,8 +11,10 @@
 #define min(i, j) ( (i) < (j) ? (i) : (j))
 
 
+void PackMatrixA( int, float *, int, float * );
+void PackMatrixB( int, float *, int, float * );
+void InnerKernel( int, int, int, float *, int, float *, int, float *, int , int);
 
-void AddDot( int, float *, int, float *, float * );
 void AddDot4x4(int, float *, int, float *, int, float *, int);
 
 void MY_MMult( int m, int n, int k, float *a, int lda, 
@@ -28,7 +30,7 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
     for ( j=0; j<n; j+=nc ){
       jb = min(n - j, nc);        // jb = j_block = 128
 
-      InnerKernel(m, jb, pb, &A(0, p), lda, &B(p, j), ldb, &C(0, j), ldc);
+      InnerKernel(m, jb, pb, &A(0, p), lda, &B(p, j), ldb, &C(0, j), ldc, i==0);
    
     }
   }
@@ -36,18 +38,39 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
 
 void InnerKernel(int m, int n, int k, float *a, int lda,
                                       float *b, int ldb,
-                                      float *c, int ldc)
+                                      float *c, int ldc, int first_time)
 {
   int i, j;
-  float packedB[k * n];
+  float packedB[k * n], packedA[ m * k];
 
-  for(i = 0; i < m; i+=4)
+  for(i = 0; i < m; i+=4){
+    //if(first_time)
+    PackMatrixA(k, &A(i, 0), lda, &packedA[i*k]);
     for(j = 0; j < n; j+=4){
       if(i == 0)
         PackMatrixB(k, &B(0, j), ldb, &packedB[k * j]);
-      AddDot4x4(k, &A(i, 0), lda, &packedB[k*j], 4, &C(i, j), ldc);
+      AddDot4x4(k, &packedA[i * k], k, &packedB[k*j], 4, &C(i, j), ldc);
+      //AddDot4x4(k, &A(i, 0), lda, &packedB[k*j], 4, &C(i, j), ldc);
     }
+  }
 }                                      
+
+void PackMatrixA( int k, float *a, int lda, float *a_to)
+{
+  int j;
+  float
+    *a_0j_ptr = &A(0, 0),
+    *a_1j_ptr = &A(1, 0),
+    *a_2j_ptr = &A(2, 0),
+    *a_3j_ptr = &A(3, 0);
+
+  for(j = 0; j < k; j++){
+    *a_to++ = *a_0j_ptr++;
+    *a_to++ = *a_1j_ptr++;
+    *a_to++ = *a_2j_ptr++;
+    *a_to++ = *a_3j_ptr++;
+  }
+}
 
 void PackMatrixB( int k, float *b, int ldb, float *b_to)
 {
@@ -55,11 +78,12 @@ void PackMatrixB( int k, float *b, int ldb, float *b_to)
   for(i = 0; i < k; i++){
     float *b_ij_ptr = &B(i, 0);
 
-    *b_to++ = *b_ij_ptr;
-    *b_to++ = *(b_ij_ptr+1);
-    *b_to++ = *(b_ij_ptr+2);
-    *b_to++ = *(b_ij_ptr+3);
+    *b_to     = *b_ij_ptr;
+    *(b_to+1) = *(b_ij_ptr+1);
+    *(b_to+2) = *(b_ij_ptr+2);
+    *(b_to+3) = *(b_ij_ptr+3);
 
+    b_to += 4;
   }
 }
 
