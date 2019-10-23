@@ -6,8 +6,8 @@
 
 /* Routine for computing C = A * B + C */
 
-#define mc 256
-#define kc 128
+#define nc 128
+#define kc 256
 #define min(i, j) ( (i) < (j) ? (i) : (j))
 
 
@@ -21,15 +21,14 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
 {
   int i, j;
 
-  int p, pb, ib;
+  int p, pb, jb;
 
   for ( p=0; p<k; p+=kc ){        
     pb = min(k - p, kc);      // pb = p_block = 256
-    for ( i=0; i<m; i+=mc ){
-      ib = min(m - i, mc);        // ib = i_block = 128
+    for ( j=0; j<n; j+=nc ){
+      jb = min(n - j, nc);        // jb = j_block = 128
 
-
-      InnerKernel(ib, n, pb, &A(i, p), lda, &B(p, 0), ldb, &C(i, 0), ldc);
+      InnerKernel(m, jb, pb, &A(0, p), lda, &B(p, j), ldb, &C(0, j), ldc);
    
     }
   }
@@ -40,17 +39,30 @@ void InnerKernel(int m, int n, int k, float *a, int lda,
                                       float *c, int ldc)
 {
   int i, j;
-  float packedA[ m * k];
+  float packedB[k * n];
+
   for(i = 0; i < m; i+=4)
     for(j = 0; j < n; j+=4){
-      PackMatrixA(k, &A(i, 0), lda, &packedA[i*k]);
+
+      PackMatrixB(k, &B(0, j), ldb, &packedB[k * j]);
       AddDot4x4(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc);
     }
-}    
+}                                      
 
-void PackMatrixA(int k, float *a, int lda, float *a_to){
+void PackMatrixB( int k, float *b, int ldb, float *b_to)
+{
+  int i;
+  for(i = 0; i < k; i++){
+    float *b_ij_ptr = &B(i, 0);
 
+    *b_to++ = *b_ij_ptr;
+    *b_to++ = *(b_ij_ptr+1);
+    *b_to++ = *(b_ij_ptr+2);
+    *b_to++ = *(b_ij_ptr+3);
+
+  }
 }
+
 
 #include <mmintrin.h>
 #include <xmmintrin.h>  // SSE
