@@ -8,6 +8,7 @@
 
 #define nc 256
 #define kc 128
+#define nb 1000
 #define min(i, j) ( (i) < (j) ? (i) : (j))
 
 
@@ -41,7 +42,8 @@ void InnerKernel(int m, int n, int k, float *a, int lda,
                                       float *c, int ldc, int first_time)
 {
   int i, j;
-  float packedB[k * n], packedA[ m * k];
+  float packedB[k * n];
+  static float packedA[ kc * nb];
 
   for(i = 0; i < m; i+=4){
     if(first_time)
@@ -50,7 +52,7 @@ void InnerKernel(int m, int n, int k, float *a, int lda,
       if(i == 0)
         PackMatrixB(k, &B(0, j), ldb, &packedB[k * j]);
       AddDot4x4(k, &packedA[i * k], k, &packedB[k*j], 4, &C(i, j), ldc);
-      //AddDot4x4(k, &A(i, 0), lda, &packedB[k*j], 4, &C(i, j), ldc);
+      // AddDot4x4(k, &A(i, 0), lda, &packedB[k*j], 4, &C(i, j), ldc);
     }
   }
 }                                      

@@ -29,6 +29,8 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
 #include <xmmintrin.h>  // SSE
 #include <pmmintrin.h>  // SSE2
 #include <emmintrin.h>  // SSE3
+#include <immintrin.h>  // fma avx avx2
+
 
 typedef union
 {
@@ -61,6 +63,7 @@ void AddDot4x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
   */
 
   v2f_t
+  
     c00_c01_c02_c03_vreg, c10_c11_c12_c13_vreg, c20_c21_c22_c23_vreg, c30_c31_c32_c33_vreg,
     
     bp0_bp1_bp2_bp3_vreg,

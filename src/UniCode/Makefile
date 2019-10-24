@@ -1,9 +1,9 @@
 # for Unicode
 
-OLD := MyMM4x4_13
-NEW := MyMM4x4_14
+OLD := MyMM4x4_14
+NEW := MyMM4x4_15
 
-CFLAGS := -O2 -msse3 -mavx -mavx2
+CFLAGS := -g -O2 -msse3 -mavx -mavx2
 LDFLAGS := -lm
 
 
@@ -22,7 +22,7 @@ run: MyMM.o MyMMult.o
 	export OMP_NUM_THREADS=1
 	export GOTO_NUM_THREADS=1
 	@./run >> ./figs/output_$(NEW).m 
-	@python plot.py $(OLD) $(NEW)
+	# @python plot.py $(OLD) $(NEW)
 
 
 clean:
