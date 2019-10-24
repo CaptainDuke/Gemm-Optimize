@@ -134,7 +134,9 @@ void AddDot4x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
 
     for(int p = 0; p < k; p++){
 
-      bp0_bp1_bp2_bp3_vreg.v = _mm_loadu_ps((float*) &B(p, 0));
+      // bp0_bp1_bp2_bp3_vreg.v = _mm_loadu_ps((float*) &B(p, 0));
+      bp0_bp1_bp2_bp3_vreg.v = _mm_loadu_ps(( float *) b);
+      b+=4;
 
       a_0p_vreg.v = _mm_load_ps1((float*) a_0p_ptr++);
       a_1p_vreg.v = _mm_load_ps1((float*) a_1p_ptr++);
