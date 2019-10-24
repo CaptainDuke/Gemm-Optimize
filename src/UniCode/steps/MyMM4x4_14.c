@@ -106,23 +106,6 @@ void AddDot4x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
 {
  
 
-
-  /*
-  register float
-    c_00_reg, c_01_reg, c_02_reg, c_03_reg, 
-    c_10_reg, c_11_reg, c_12_reg, c_13_reg, 
-    c_20_reg, c_21_reg, c_22_reg, c_23_reg, 
-    c_30_reg, c_31_reg, c_32_reg, c_33_reg,
-
-    // store B(p, 0-3)
-    b_p0_reg,  b_p1_reg,  b_p2_reg,  b_p3_reg,
-    
-    a_0p_reg,
-    a_1p_reg,
-    a_2p_reg,
-    a_3p_reg;
-  */
-
   v2f_t
     c00_c01_c02_c03_vreg, c10_c11_c12_c13_vreg, c20_c21_c22_c23_vreg, c30_c31_c32_c33_vreg,
     
@@ -151,10 +134,6 @@ void AddDot4x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
     c30_c31_c32_c33_vreg.v = _mm_setzero_ps();
 
     
-    // c_00_reg = 0.0; c_01_reg = 0.0; c_02_reg = 0.0; c_03_reg = 0.0; 
-    // c_10_reg = 0.0; c_11_reg = 0.0; c_12_reg = 0.0; c_13_reg = 0.0; 
-    // c_20_reg = 0.0; c_21_reg = 0.0; c_22_reg = 0.0; c_23_reg = 0.0; 
-    // c_30_reg = 0.0; c_31_reg = 0.0; c_32_reg = 0.0; c_33_reg = 0.0;
 
     for(int p = 0; p < k; p++){
 
@@ -169,14 +148,10 @@ void AddDot4x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
       a+=4;
 
       //first row and second row
-      //c00_c01_c02_c03_vreg.v += a_0p_vreg.v * bp0_bp1_bp2_bp3_vreg.v;
-      //c10_c11_c12_c13_vreg.v += a_1p_vreg.v * bp0_bp1_bp2_bp3_vreg.v;
-
       c00_c01_c02_c03_vreg.v += _mm_mul_ps(a_0p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
       c10_c11_c12_c13_vreg.v += _mm_mul_ps(a_1p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
+      
       // Third and fourth row
-      //c20_c21_c22_c23_vreg.v += a_2p_vreg.v * bp0_bp1_bp2_bp3_vreg.v;
-      //c30_c31_c32_c33_vreg.v += a_3p_vreg.v * bp0_bp1_bp2_bp3_vreg.v;
       c20_c21_c22_c23_vreg.v += _mm_mul_ps(a_2p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
       c30_c31_c32_c33_vreg.v += _mm_mul_ps(a_3p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
 
