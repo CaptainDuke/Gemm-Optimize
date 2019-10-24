@@ -30,7 +30,7 @@ void MY_MMult( int m, int n, int k, float *a, int lda,
     for ( j=0; j<n; j+=nc ){
       jb = min(n - j, nc);        // jb = j_block = 128
 
-      InnerKernel(m, jb, pb, &A(0, p), lda, &B(p, j), ldb, &C(0, j), ldc, i==0);
+      InnerKernel(m, jb, pb, &A(0, p), lda, &B(p, j), ldb, &C(0, j), ldc, j==0);
    
     }
   }
