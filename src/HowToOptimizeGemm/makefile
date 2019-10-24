@@ -5,7 +5,7 @@ NEW  := MMult_4x4_15
 # sample makefile
 #
 
-CC         := gcc
+CC         := icc
 LINKER     := $(CC)
 CFLAGS     := -g -O2 -Wall -msse3
 LDFLAGS    := -lm
@@ -42,7 +42,7 @@ run:
 	cp output_$(NEW).m output_new.m
 
 clean:
-	rm -f *.o *~ core *.x
+	rm -f *.o *~ core 
 
 cleanall:
 	rm -f *.o *~ core *.x output*.m *.eps *.png

@@ -109,11 +109,12 @@ int main(){
     ldb = n;
     ldc = n;
 
-    a = (float *) malloc(lda * (k+1) * sizeof(float));
-    b = (float *) malloc(ldb * n * sizeof(float));
-    c = (float *) malloc(ldc * n * sizeof(float));
-    cold = (float *) malloc(ldb * n * sizeof(float));
-    cref = (float *) malloc(ldb * n * sizeof(float));
+    // a = (float *) malloc(lda * (k+1) * sizeof(float));
+    a = (float *) malloc(m * lda * sizeof(float));
+    b = (float *) malloc((k+1) * ldb * sizeof(float));
+    c = (float *) malloc(m* ldc  * sizeof(float));
+    cold = (float *) malloc(m * ldc * sizeof(float));
+    cref = (float *) malloc(m * ldc * sizeof(float));
 
     random_matrix( m, k, a, lda);       // a = random
     random_matrix( k, n, b, ldb);       // b = random
