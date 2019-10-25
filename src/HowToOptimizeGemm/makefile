@@ -5,7 +5,7 @@ NEW  := MMult_4x4_15
 # sample makefile
 #
 
-CC         := icc
+CC         := gcc-9
 LINKER     := $(CC)
 CFLAGS     := -g -O2 -Wall -msse3
 LDFLAGS    := -lm

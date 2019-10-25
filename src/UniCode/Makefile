@@ -3,8 +3,8 @@
 OLD := MyMM4x4_14
 NEW := MyMM4x4_15
 
-CC := icc
-CFLAGS := -g -O2 -msse3 -mavx -mavx2
+CC := gcc-9
+CFLAGS := -g -O3 -msse3 -mavx -mavx2
 LDFLAGS := -lm
 
 
