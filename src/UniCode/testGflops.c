@@ -117,6 +117,14 @@ int main(){
   // pb = &b;
   pdst = &dst[0];
   __m128 dstreg ;
+  __m128 ereg = _mm_setzero_ps();
+
+  __m128 freg = _mm_setzero_ps();
+  __m128 greg = _mm_setzero_ps();
+  __m128 hreg = _mm_setzero_ps();
+  __m128 ireg = _mm_setzero_ps();
+  __m128 jreg = _mm_setzero_ps();
+  
   
 
   int NN = 10000;
@@ -138,9 +146,21 @@ int main(){
 
 
     dtime = dclock();
-    for(int i = 0; i < NN/2; i++){
-      dstreg = _mm_fmadd_ps(areg, breg, dstreg);
-      dstreg = _mm_fmadd_ps(areg, breg, dstreg);
+    for(int i = 0; i < NN/10; i++){
+      dstreg = _mm_fmadd_ps(dstreg, dstreg, dstreg);
+      areg = _mm_fmadd_ps(areg, areg,areg);
+      breg = _mm_fmadd_ps(breg, breg,breg);
+      creg = _mm_fmadd_ps(creg,creg,creg);
+      ereg = _mm_fmadd_ps(ereg, ereg,ereg);
+
+      freg = _mm_fmadd_ps(freg, freg,freg);
+      greg = _mm_fmadd_ps(greg, greg,greg);
+      hreg = _mm_fmadd_ps(hreg, hreg,hreg);
+      ireg = _mm_fmadd_ps(ireg, ireg,ireg);
+      jreg = _mm_fmadd_ps(jreg, jreg,jreg);
+
+      // dstreg = _mm_fmadd_ps(areg, breg, dstreg);
+      // creg = _mm_fmadd_ps(areg, breg, breg);
       
     }
     dtime = dclock() - dtime;
