@@ -94,6 +94,7 @@ void PackMatrixB( int k, float *b, int ldb, float *b_to)
 #include <xmmintrin.h>  // SSE
 #include <pmmintrin.h>  // SSE2
 #include <emmintrin.h>  // SSE3
+#include <immintrin.h>  // fma
 
 typedef union
 {
@@ -150,21 +151,56 @@ void AddDot4x4(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
       a+=4;
 
       //first row and second row
-      c00_c01_c02_c03_vreg.v += _mm_mul_ps(a_0p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
-      c10_c11_c12_c13_vreg.v += _mm_mul_ps(a_1p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
+      // sse
+      // c00_c01_c02_c03_vreg.v += _mm_mul_ps(a_0p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
+      // c10_c11_c12_c13_vreg.v += _mm_mul_ps(a_1p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
       
+      // fma
+      c00_c01_c02_c03_vreg.v = _mm_fmadd_ps(a_0p_vreg.v, bp0_bp1_bp2_bp3_vreg.v, c00_c01_c02_c03_vreg.v);
+      c10_c11_c12_c13_vreg.v = _mm_fmadd_ps(a_1p_vreg.v, bp0_bp1_bp2_bp3_vreg.v, c10_c11_c12_c13_vreg.v);
+
+      // naive
+      // c00_c01_c02_c03_vreg.v += a_0p_vreg.v * bp0_bp1_bp2_bp3_vreg.v;
+      // c10_c11_c12_c13_vreg.v += a_1p_vreg.v * bp0_bp1_bp2_bp3_vreg.v;
+    
+
       // Third and fourth row
-      c20_c21_c22_c23_vreg.v += _mm_mul_ps(a_2p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
-      c30_c31_c32_c33_vreg.v += _mm_mul_ps(a_3p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
+      // sse
+      // c20_c21_c22_c23_vreg.v += _mm_mul_ps(a_2p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
+      // c30_c31_c32_c33_vreg.v += _mm_mul_ps(a_3p_vreg.v , bp0_bp1_bp2_bp3_vreg.v);
+
+      // fma
+      c20_c21_c22_c23_vreg.v = _mm_fmadd_ps(a_2p_vreg.v, bp0_bp1_bp2_bp3_vreg.v, c20_c21_c22_c23_vreg.v);
+      c30_c31_c32_c33_vreg.v = _mm_fmadd_ps(a_3p_vreg.v, bp0_bp1_bp2_bp3_vreg.v, c30_c31_c32_c33_vreg.v);
+
+      // naive
+      // c20_c21_c22_c23_vreg.v += a_2p_vreg.v * bp0_bp1_bp2_bp3_vreg.v;
+      // c30_c31_c32_c33_vreg.v += a_3p_vreg.v * bp0_bp1_bp2_bp3_vreg.v;
 
 
 
     }
 
-    C(0, 0) += c00_c01_c02_c03_vreg.d[0]; C(0, 1) += c00_c01_c02_c03_vreg.d[1]; C(0, 2) += c00_c01_c02_c03_vreg.d[2]; C(0, 3) += c00_c01_c02_c03_vreg.d[3];
-    C(1, 0) += c10_c11_c12_c13_vreg.d[0]; C(1, 1) += c10_c11_c12_c13_vreg.d[1]; C(1, 2) += c10_c11_c12_c13_vreg.d[2]; C(1, 3) += c10_c11_c12_c13_vreg.d[3];
-    C(2, 0) += c20_c21_c22_c23_vreg.d[0]; C(2, 1) += c20_c21_c22_c23_vreg.d[1]; C(2, 2) += c20_c21_c22_c23_vreg.d[2]; C(2, 3) += c20_c21_c22_c23_vreg.d[3];
-    C(3, 0) += c30_c31_c32_c33_vreg.d[0]; C(3, 1) += c30_c31_c32_c33_vreg.d[1]; C(3, 2) += c30_c31_c32_c33_vreg.d[2]; C(3, 3) += c30_c31_c32_c33_vreg.d[3];
-  
+    // C(0, 0) += c00_c01_c02_c03_vreg.d[0]; C(0, 1) += c00_c01_c02_c03_vreg.d[1]; C(0, 2) += c00_c01_c02_c03_vreg.d[2]; C(0, 3) += c00_c01_c02_c03_vreg.d[3];
+    // C(1, 0) += c10_c11_c12_c13_vreg.d[0]; C(1, 1) += c10_c11_c12_c13_vreg.d[1]; C(1, 2) += c10_c11_c12_c13_vreg.d[2]; C(1, 3) += c10_c11_c12_c13_vreg.d[3];
+    // C(2, 0) += c20_c21_c22_c23_vreg.d[0]; C(2, 1) += c20_c21_c22_c23_vreg.d[1]; C(2, 2) += c20_c21_c22_c23_vreg.d[2]; C(2, 3) += c20_c21_c22_c23_vreg.d[3];
+    // C(3, 0) += c30_c31_c32_c33_vreg.d[0]; C(3, 1) += c30_c31_c32_c33_vreg.d[1]; C(3, 2) += c30_c31_c32_c33_vreg.d[2]; C(3, 3) += c30_c31_c32_c33_vreg.d[3];
+
+    __m128 C00_03 = _mm_loadu_ps(&C(0,0));
+    __m128 C10_13 = _mm_loadu_ps(&C(1,0));
+    __m128 C20_23 = _mm_loadu_ps(&C(2,0));
+    __m128 C30_33 = _mm_loadu_ps(&C(3,0));
+
+    C00_03 = _mm_add_ps(C00_03, c00_c01_c02_c03_vreg.v);
+    C10_13 = _mm_add_ps(C10_13, c10_c11_c12_c13_vreg.v);
+    C20_23 = _mm_add_ps(C20_23, c20_c21_c22_c23_vreg.v);
+    C30_33 = _mm_add_ps(C30_33, c30_c31_c32_c33_vreg.v);
+
+    _mm_storeu_ps(&C(0,0), C00_03);
+    _mm_storeu_ps(&C(1,0), C10_13);
+    _mm_storeu_ps(&C(2,0), C20_23);
+    _mm_storeu_ps(&C(3,0), C30_33);
+
+
 }
 

@@ -4,7 +4,7 @@ OLD := MyMM4x4_14
 NEW := MyMM4x4_15
 
 CC := gcc-9
-CFLAGS := -g -O3 -msse3 -mavx -mavx2
+CFLAGS := -g -O2 -msse3 -mavx -mavx2 -mfma
 LDFLAGS := -lm
 
 
