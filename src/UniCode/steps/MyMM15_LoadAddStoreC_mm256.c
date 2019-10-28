@@ -76,7 +76,7 @@ void InnerKernel8(int m, int n, int k, float *a, int lda,
     for(j = 0; j < n; j+=8){
       if(i == 0)
         PackMatrixB8(k, &B(0, j), ldb, &packedB[k * j]);
-      AddDot8x8(k, &packedA[i * k], k, &packedB[k*j], 4, &C(i, j), ldc);
+      AddDot8x8(k, &packedA[i * k], k, &packedB[k*j], 8, &C(i, j), ldc);
       // AddDot4x4(k, &A(i, 0), lda, &packedB[k*j], 4, &C(i, j), ldc);
     }
   }
@@ -291,6 +291,11 @@ void AddDot8x8(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
     c20_to_c27_vreg = _mm256_setzero_ps();
     c30_to_c37_vreg = _mm256_setzero_ps();
 
+    c40_to_c47_vreg = _mm256_setzero_ps();
+    c50_to_c57_vreg = _mm256_setzero_ps();
+    c60_to_c67_vreg = _mm256_setzero_ps();
+    c70_to_c77_vreg = _mm256_setzero_ps();
+
     
 
     for(int p = 0; p < k; p++){
@@ -368,7 +373,7 @@ void AddDot8x8(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
 
     __m256 C20_27 = _mm256_loadu_ps(&C(2,0));
     C20_27 = _mm256_add_ps(C20_27, c20_to_c27_vreg);
-    _mm256_storeu_ps(&C(1,0), C10_17);
+    _mm256_storeu_ps(&C(2,0), C20_27);
 
     __m256 C30_37 = _mm256_loadu_ps(&C(3,0));
     C30_37 = _mm256_add_ps(C30_37, c30_to_c37_vreg);
@@ -389,7 +394,7 @@ void AddDot8x8(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
     _mm256_storeu_ps(&C(6,0), C60_67);
 
     __m256 C70_77 = _mm256_loadu_ps(&C(7,0));
-    C70_77 = _mm256_add_ps(C60_67, c60_to_c67_vreg);
+    C70_77 = _mm256_add_ps(C70_77, c70_to_c77_vreg);
     _mm256_storeu_ps(&C(7,0), C70_77);
 
   
