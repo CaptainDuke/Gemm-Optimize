@@ -1,3 +1,10 @@
+
+/*
+  Useage: 
+            gcc-9 -g -O1 -msse3 -mfma testGflops.c
+            icc -g -O2 -msse3 -mfma testGflops.c
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "parameters.h"
@@ -13,10 +20,6 @@
 #include <immintrin.h>  // fma
 
 static double gtod_ref_time_sec = 0.0;
-
-#define A(i,j) a[ (i)*lda + (j) ]  // row first
-#define B(i,j) b[ (i)*ldb + (j) ]
-#define C(i,j) c[ (i)*ldc + (j) ]
 
 double dclock()
 {
@@ -35,212 +38,57 @@ double dclock()
         return the_time;
 }
 
-void random_matrix( int m, int n, float *a, int lda )
-{
-  // float frand48();
-  int i,j;
-  for ( i=0; i<m; i++ )
-    for ( j=0; j<n; j++ )
-      A( i,j ) = 2.0 * (float)drand48( ) - 1.0;
-}
-
-
-/* Routine for computing C = A * B + C */
-
-void REF_MMult( int m, int n, int k, float *a, int lda, 
-                                    float *b, int ldb,
-                                    float *c, int ldc )
-{
-  int i, j, p;
-  for ( i=0; i<m; i++ ){
-    for ( j=0; j<n; j++ ){
-      for ( p=0; p<k; p++ ){
-	      C( i,j ) = C( i,j ) +  A( i,p ) * B( p,j );
-      }
-    }
-  }
-}
-
-
-void copy_matrix( int m, int n, float *a, int lda, float *b, int ldb )
-{
-  int i, j;
-  for ( i=0; i<m; i++ )
-    for ( j=0; j<n; j++ )
-      B( i,j ) = A( i,j );
-}
-  
-float compare_matrices( int m, int n, float *a, int lda, float *b, int ldb )
-{
-  int i, j;
-  float max_diff = 0.0, diff;
-  for ( i=0; i<m; i++ )
-    for ( j=0; j<n; j++ )
-    {
-      diff = abs( A( i,j ) - B( i,j ) );
-      max_diff = ( diff > max_diff ? diff : max_diff );
-    }
-
-  return max_diff;
-}
-
-
-
-// ====================== main =================================================
-
+// ====================== main ================================================
 int main(){  
-  // int 
-  //   p, 
-  //   m, n, k,
-  //   lda, ldb, ldc, 
-  //   rep;
-
   float
     dtime, dtime_best,        
     gflops, 
     diff;
 
-  float 
-    *pa, *pb, *pc, *pdst, *cref, *cold;    
-  
-  // printf( "MY_MMult = [\n" );
 
+  long NN = 1000000;
+  gflops = 8* NN * 2.0*1.0e-09;
 
-  float a[4] = {1.0, 2.0, 3.0, 4.0};
-  float b[4] = {1.0, 1.0, 1.0, 1.0};
-  float c[4] = {1.0, 1.0, 1.0, 1.0};
-  float dst[4] ;
-    pa = (float *) malloc(4 * sizeof(float));
-    pb = (float *) malloc(4 * sizeof(float));
-    pc = (float *) malloc(4 * sizeof(float));
-  // pa = &a;
-  // pb = &b;
-  pdst = &dst[0];
-  __m128 dstreg ;
-  __m128 ereg = _mm_setzero_ps();
+  __m256 areg = _mm256_set1_ps(0.0);
+  __m256 breg = _mm256_set1_ps(0.0);
+  __m256 creg = _mm256_set1_ps(0.0);
+  __m256 dreg = _mm256_set1_ps(0.0);
+  __m256 ereg = _mm256_set1_ps(0.0);
 
-  __m128 freg = _mm_setzero_ps();
-  __m128 greg = _mm_setzero_ps();
-  __m128 hreg = _mm_setzero_ps();
-  __m128 ireg = _mm_setzero_ps();
-  __m128 jreg = _mm_setzero_ps();
-  
-  
-
-  int NN = 10000;
-  gflops = NN * 2.0*1.0e-09;
-
-  // dstreg = _mm_fmadd_ps(areg, breg, creg);
-  // _mm_store_ps(pc, creg);
-
-  // for(int i  = 0 ; i < 4; i ++){
-  //   printf("%i  %f \n", i ,*(pc+i));
-  // }
+  __m256 freg = _mm256_set1_ps(0.0);
+  __m256 greg = _mm256_set1_ps(0.0);
+  __m256 hreg = _mm256_set1_ps(0.0);
+  __m256 ireg = _mm256_set1_ps(0.0);
+  __m256 jreg = _mm256_set1_ps(0.0);
 
   for(int loop = 0; loop < 3; loop++){
-
-  __m128 areg = _mm_loadu_ps(&a[0]);
-  __m128 breg = _mm_loadu_ps(&b[0]);
-  __m128 creg = _mm_loadu_ps(&c[0]);
-  dstreg = _mm_setzero_ps();
-
-
     dtime = dclock();
-    for(int i = 0; i < NN/10; i++){
-      dstreg = _mm_fmadd_ps(dstreg, dstreg, dstreg);
-      areg = _mm_fmadd_ps(areg, areg,areg);
-      breg = _mm_fmadd_ps(breg, breg,breg);
-      creg = _mm_fmadd_ps(creg,creg,creg);
-      ereg = _mm_fmadd_ps(ereg, ereg,ereg);
 
-      freg = _mm_fmadd_ps(freg, freg,freg);
-      greg = _mm_fmadd_ps(greg, greg,greg);
-      hreg = _mm_fmadd_ps(hreg, hreg,hreg);
-      ireg = _mm_fmadd_ps(ireg, ireg,ireg);
-      jreg = _mm_fmadd_ps(jreg, jreg,jreg);
+    for(long i = 0; i < NN; i++){
+        areg = _mm256_fmadd_ps(areg, areg,areg);
+        breg = _mm256_fmadd_ps(breg, breg,breg);
+        creg = _mm256_fmadd_ps(creg, creg,creg);
+        dreg = _mm256_fmadd_ps(dreg, dreg,dreg);
+        ereg = _mm256_fmadd_ps(ereg, ereg,ereg);
 
-      // dstreg = _mm_fmadd_ps(areg, breg, dstreg);
-      // creg = _mm_fmadd_ps(areg, breg, breg);
-      
+        freg = _mm256_fmadd_ps(freg, freg,freg);
+        greg = _mm256_fmadd_ps(greg, greg,greg);
+        hreg = _mm256_fmadd_ps(hreg, hreg,hreg);
+        ireg = _mm256_fmadd_ps(ireg, ireg,ireg);
+        jreg = _mm256_fmadd_ps(jreg, jreg,jreg);
     }
+    
     dtime = dclock() - dtime;
+    printf("%le %le %le %le %le    %le %le %le %le %le \n", 
+            areg[0], breg[0], creg[0], dreg[0], ereg[0],
+            freg[0], greg[0], hreg[0], ireg[0], jreg[0]
+            );
+            
     if( loop == 0)
       dtime_best = dtime;
     else
       dtime_best = (dtime < dtime_best ? dtime : dtime_best);
   }
-  
-  _mm_store_ps(pdst, dstreg);
-  for(int i  = 0 ; i < 4; i ++){
-    printf("%i  %f \n", i ,*(pdst+i));
-  }
-  
-  printf( "%d %le \n", NN, gflops / dtime_best );
-  // free(a);
-  // free(b);
-
-  
-
-
-
-  // for(int i = 0; i < 1000; i++){
-
-  // }
-
-
-  // for( p = PFIRST; p<=PLAST; p+=PINC){
-  //   m = p;
-  //   n = p;
-  //   k = p;
-
-  //   gflops = 2.0 * m * n * k * 1.0e-09;
-
-  //   lda = k;
-  //   ldb = n;
-  //   ldc = n;
-
-  //   // a = (float *) malloc(lda * (k+1) * sizeof(float));
-  //   a = (float *) malloc(m * lda * sizeof(float));
-  //   b = (float *) malloc((k+1) * ldb * sizeof(float));
-  //   c = (float *) malloc(m* ldc  * sizeof(float));
-  //   cold = (float *) malloc(m * ldc * sizeof(float));
-  //   cref = (float *) malloc(m * ldc * sizeof(float));
-
-  //   random_matrix( m, k, a, lda);       // a = random
-  //   random_matrix( k, n, b, ldb);       // b = random
-  //   random_matrix( m, n, cold, ldc);    // cold = random
-
-  //   copy_matrix( m, n, cold, ldc, cref, ldc);   // cref = cold
-
-  //   REF_MMult(m, n, k, a, lda, b, ldb, cref, ldc);
-
-  //   for( rep = 0; rep < NREPEATS; rep++){
-  //     copy_matrix( m, n, cold, ldc, c, ldc);    // c = cold
-  //     dtime = dclock();
-
-  //     MY_MMult( m, n, k, a, lda, b, ldb, c, ldc);
-
-  //     dtime = dclock() - dtime;
-
-  //     if( rep == 0)
-  //       dtime_best = dtime;
-  //     else
-  //       dtime_best = (dtime < dtime_best ? dtime : dtime_best);
-  //   }
-
-  //   diff = compare_matrices( m, n, c, ldc, cref, ldc);
-
-  //   printf( "%d %le %le \n", p, gflops / dtime_best, diff );
-
-  //   free(a);
-  //   free( b );
-  //   free( c );
-  //   free( cold );
-  //   free( cref );
-
-  // }
-  // printf( "];\n" );
-
+  printf( "%ld %le \n", NN, gflops * 10 / dtime_best );
   exit( 0 );
-    
 }
