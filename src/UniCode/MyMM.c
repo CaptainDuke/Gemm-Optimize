@@ -22,6 +22,20 @@ void InnerKernel8( int, int, int, float *, int, float *, int, float *, int , int
 void AddDot4x4(int, float *, int, float *, int, float *, int);
 void AddDot8x8(int, float *, int, float *, int, float *, int);
 
+
+void packB_4(int k, int n, float* from, int ldb, float* to);
+void packA_4(int m, int k, float* from, int lda, float* to);
+void kernel_4x4(int m, int n, int k, float* sa, float* sb, float* sc, int ldc);
+
+float* fastMalloc(int size)
+{
+  void *ptr = 0;
+  int iRet = posix_memalign(&ptr, 64, size*sizeof(float));
+  assert(0 == iRet);
+  return ptr;
+}
+
+
 void MY_MMult( int m, int n, int k, float *a, int lda, 
                                     float *b, int ldb,
                                     float *c, int ldc )
@@ -166,6 +180,179 @@ void PackMatrixB8( int k, float *b, int ldb, float *b_to)
 
     b_to += 8;
   }
+}
+
+
+void packA_4(int m, int k, float* from, int lda, float* to)
+{
+  assert( k!= 0 && m != 0 && k % 4 == 0 && m % 4 == 0);
+  int i, j;
+
+  float *from_offset, 
+        *from_offset1, 
+        *from_offset2, 
+        *from_offset3, 
+        *from_offset4;
+  float *to_offset;
+  float ctemp1,  ctemp2,  ctemp3,  ctemp4, 
+        ctemp5,  ctemp6,  ctemp7,  ctemp8,
+        ctemp9,  ctemp10, ctemp11, ctemp12,
+        ctemp13, ctemp14, ctemp15, ctemp16;
+
+  from_offset = from;
+  to_offset = to;
+
+  for(i = 0; i < m >> 2; i++)
+  {
+    from_offset1 = from_offset;
+    from_offset2 = from_offset1 + lda;
+    from_offset3 = from_offset2 + lda;
+    from_offset4 = from_offset3 + lda;
+    from_offset += 4 * lda;
+
+    for(j = 0; j < k >> 2; j++)
+    {
+      ctemp1 = *(from_offset1);
+      ctemp2 = *(from_offset1 + 1);
+      ctemp3 = *(from_offset1 + 2);
+      ctemp4 = *(from_offset1 + 3);
+
+      ctemp5 = *(from_offset2);
+      ctemp6 = *(from_offset2 + 1);
+      ctemp7 = *(from_offset2 + 2);
+      ctemp8 = *(from_offset2 + 3);
+
+      ctemp9  = *(from_offset3 );
+      ctemp10 = *(from_offset3 + 1);
+      ctemp11 = *(from_offset3 + 2);
+      ctemp12 = *(from_offset3 + 3);
+
+
+      ctemp13 = *(from_offset4 );
+      ctemp14 = *(from_offset4 + 1);
+      ctemp15 = *(from_offset4 + 2);
+      ctemp16 = *(from_offset4 + 3);
+
+      *(to_offset + 0) = ctemp1;
+      *(to_offset + 1) = ctemp5;
+      *(to_offset + 2) = ctemp9;
+      *(to_offset + 3) = ctemp13;
+
+
+      *(to_offset + 4) = ctemp2;
+      *(to_offset + 5) = ctemp6;
+      *(to_offset + 6) = ctemp19;
+      *(to_offset + 7) = ctemp14;
+
+
+      *(to_offset + 8) = ctemp3;
+      *(to_offset + 9) = ctemp7;
+      *(to_offset + 10) = ctemp11;
+      *(to_offset + 11) = ctemp15;
+
+
+      *(to_offset + 12) = ctemp4;
+      *(to_offset + 13) = ctemp8;
+      *(to_offset + 14) = ctemp12;
+      *(to_offset + 15) = ctemp16;
+
+      from_offset1 += 4;
+      from_offset2 += 4;
+      from_offset3 += 4;
+      from_offset4 += 4;
+
+      to_offset += 16;
+    }
+  }
+}
+
+void packB_4(int k, int n, float* from, int ldb, float* to)
+{
+  assert( k!= 0 && n != 0 && k % 4 == 0 && n % 4 == 0);
+
+  int i, j;
+  
+  float *from_offset, 
+        *from_offset1, 
+        *from_offset2, 
+        *from_offset3, 
+        *from_offset4;
+
+  float *to_offset, *to_offset1;
+
+  float ctemp1,  ctemp2,  ctemp3,  ctemp4, 
+        ctemp5,  ctemp6,  ctemp7,  ctemp8,
+        ctemp9,  ctemp10, ctemp11, ctemp12,
+        ctemp13, ctemp14, ctemp15, ctemp16;
+
+  from_offset = from;
+  to_offset = to;
+
+  for(i = 0; i < k >> 2; i++){
+    from_offset1 = from_offset;
+    from_offset2 = from_offset1 + ldb;
+    from_offset3 = from_offset2 + ldb;
+    from_offset4 = from_offset3 + ldb;
+    from_offset += 4 * ldb;
+
+    to_offset1 = to_offset;
+    to_offset += 16;
+
+    for(j = 0; j < n >> 2; j++){
+      ctemp1 = *(from_offset1);
+      ctemp2 = *(from_offset1 + 1);
+      ctemp3 = *(from_offset1 + 2);
+      ctemp4 = *(from_offset1 + 3);
+
+      ctemp5 = *(from_offset2);
+      ctemp6 = *(from_offset2 + 1);
+      ctemp7 = *(from_offset2 + 2);
+      ctemp8 = *(from_offset2 + 3);
+
+      ctemp9  = *(from_offset3 );
+      ctemp10 = *(from_offset3 + 1);
+      ctemp11 = *(from_offset3 + 2);
+      ctemp12 = *(from_offset3 + 3);
+
+
+      ctemp13 = *(from_offset4 );
+      ctemp14 = *(from_offset4 + 1);
+      ctemp15 = *(from_offset4 + 2);
+      ctemp16 = *(from_offset4 + 3);
+
+      from_offset1 += 4;
+      from_offset2 += 4;
+      from_offset3 += 4;
+      from_offset4 += 4;
+      
+      *(to_offset + 0) = ctemp1;
+      *(to_offset + 1) = ctemp2;
+      *(to_offset + 2) = ctemp3;
+      *(to_offset + 3) = ctemp4;
+
+
+      *(to_offset + 4) = ctemp5;
+      *(to_offset + 5) = ctemp6;
+      *(to_offset + 6) = ctemp7;
+      *(to_offset + 7) = ctemp8;
+
+
+      *(to_offset + 8)  = ctemp9;
+      *(to_offset + 9)  = ctemp10;
+      *(to_offset + 10) = ctemp11;
+      *(to_offset + 11) = ctemp12;
+
+
+      *(to_offset + 12) = ctemp13;
+      *(to_offset + 13) = ctemp14;
+      *(to_offset + 14) = ctemp15;
+      *(to_offset + 15) = ctemp16;
+
+      to_offset1 += k * 4;
+    }
+  }
+
+
 }
 
 #include <mmintrin.h>
@@ -403,5 +590,115 @@ void AddDot8x8(int k, float *a, int lda,  float *b, int ldb, float *c, int ldc )
     _mm256_storeu_ps(&C(7,0), C70_77);
 
   
+
+}
+
+
+void kernel_4x4(int m, int n, int k, float* sa, float* sb, float* sc, int ldc)
+{
+  assert( m > 0 && n > 0 && k > 0);
+  assert( m % 4 == 0 && n % 4 == 0 && k % 4 == 0);
+
+  float *restrict a = sa, *restrict b = sb, *restrict c = sc;
+  int i, j, l;
+  for(i = 0; i < m i += 4)
+  {
+    for(j = 0; j < n; j += 4)
+    {
+      __builtin_prefetch(b, 0, 3);    // load data from memory to cache before used
+      __builtin_prefetch(a, 0, 3);  
+
+      // __m128 v24, v25, v26, v27;
+      __m128 c00_03 = _mm_setzero_ps(), 
+             c10_13 = _mm_setzero_ps(),
+             c20_23 = _mm_setzero_ps(),
+             c30_33 = _mm_setzero_ps();
+
+      __m128 a0p_vreg,
+             a1p_vreg,
+             a2p_vreg,
+             a3p_vreg;
+      __m128 b0_3_vreg;
+          
+      for(l = 0; l < k; l+=4)
+      {
+        // __m128 b0_3 = _mm_loadu_ps(b);
+        // __m128 a0_3 = _mm_loadu_ps(a);
+
+        b0_3_vreg = _mm_loadu_ps(b);
+
+        a0p_vreg = _mm_load_ps1(a);
+        a1p_vreg = _mm_load_ps1(a+1);
+        a2p_vreg = _mm_load_ps1(a+2);
+        a3p_vreg = _mm_load_ps1(a+3);
+
+        c00_03 = _mm_fmadd_ps(a0p_vreg, b0_3_vreg, c00_03);
+        c10_13 = _mm_fmadd_ps(a1p_vreg, b0_3_vreg, c10_13);
+        c20_23 = _mm_fmadd_ps(a2p_vreg, b0_3_vreg, c20_23);
+        c30_33 = _mm_fmadd_ps(a3p_vreg, b0_3_vreg, c30_33);
+
+
+        b0_3_vreg = _mm_loadu_ps(b+4);
+
+        a0p_vreg = _mm_load_ps1(a + 4 );
+        a1p_vreg = _mm_load_ps1(a + 4 + 1);
+        a2p_vreg = _mm_load_ps1(a + 4 + 2);
+        a3p_vreg = _mm_load_ps1(a + 4 + 3);
+
+        c00_03 = _mm_fmadd_ps(a0p_vreg, b0_3_vreg, c00_03);
+        c10_13 = _mm_fmadd_ps(a1p_vreg, b0_3_vreg, c10_13);
+        c20_23 = _mm_fmadd_ps(a2p_vreg, b0_3_vreg, c20_23);
+        c30_33 = _mm_fmadd_ps(a3p_vreg, b0_3_vreg, c30_33);
+
+
+        b0_3_vreg = _mm_loadu_ps(b+8);
+
+        a0p_vreg = _mm_load_ps1(a + 8 ) ;
+        a1p_vreg = _mm_load_ps1(a + 8 + 1);
+        a2p_vreg = _mm_load_ps1(a + 8 + 2);
+        a3p_vreg = _mm_load_ps1(a + 8 + 3);
+
+        c00_03 = _mm_fmadd_ps(a0p_vreg, b0_3_vreg, c00_03);
+        c10_13 = _mm_fmadd_ps(a1p_vreg, b0_3_vreg, c10_13);
+        c20_23 = _mm_fmadd_ps(a2p_vreg, b0_3_vreg, c20_23);
+        c30_33 = _mm_fmadd_ps(a3p_vreg, b0_3_vreg, c30_33);
+
+
+        b0_3_vreg = _mm_loadu_ps(b+12);
+
+        a0p_vreg = _mm_load_ps1(a+12);
+        a1p_vreg = _mm_load_ps1(a+12+1);
+        a2p_vreg = _mm_load_ps1(a+12+2);
+        a3p_vreg = _mm_load_ps1(a+12+3);
+
+        c00_03 = _mm_fmadd_ps(a0p_vreg, b0_3_vreg, c00_03);
+        c10_13 = _mm_fmadd_ps(a1p_vreg, b0_3_vreg, c10_13);
+        c20_23 = _mm_fmadd_ps(a2p_vreg, b0_3_vreg, c20_23);
+        c30_33 = _mm_fmadd_ps(a3p_vreg, b0_3_vreg, c30_33);
+
+        __builtin_prefetch(b+16, 0, 3);
+        __builtin_prefetch(a+16, 0, 3);
+        b += 16;
+        a += 16;
+      }
+
+      c00_03 = _mm_add_ps(_mm_loadu_ps(c), c00_03);
+      c10_13 = _mm_add_ps(_mm_loadu_ps(c + ldc), c10_13);
+      c20_23 = _mm_add_ps(_mm_loadu_ps(c + 2*ldc), c20_23);
+      c30_33 = _mm_add_ps(_mm_loadu_ps(c + 3*ldc), c30_33);
+
+      _mm_storeu_ps(c, c00_03);
+      _mm_storeu_ps(c + ldc, c10_13);
+      _mm_storeu_ps(c + 2*ldc, c20_23);
+      _mm_storeu_ps(c + 3*ldc, c30_33);
+
+      c += 4;
+      a -= 4*k;
+    }
+    sc += ldc * 4;
+    c = sc;
+    a += 4*k;
+    b = sb;
+  }
 
 }
